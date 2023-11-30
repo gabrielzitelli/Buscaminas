@@ -28,7 +28,14 @@ class BuscaMinas:
         print()
         for row in self.grid:
             for col in row:
-                print(". " if col.hidden else f"{col.content} ", end="")
+                if col.marked:
+                    cell_display = "M "
+                elif col.hidden:
+                    cell_display = ". "
+                else:
+                    cell_display = str(col.content) + " "
+
+                print(cell_display, end="")
             print()
         print()
 
@@ -39,7 +46,6 @@ class BuscaMinas:
             print("¡Boom!")
         else:
             self.reveal_cell_and_adjacent(x, y)
-            self.display()
 
     def reveal_cell_and_adjacent(self, x, y):
         cell = self.grid[x][y]
