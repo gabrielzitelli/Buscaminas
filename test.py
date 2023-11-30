@@ -3,11 +3,14 @@ from io import StringIO
 import sys
 from buscaminas import Cell, BuscaMinas
 
+
 class TestCell(unittest.TestCase):
     def test_cell_initial_state(self):
         cell = Cell(0)
         self.assertTrue(cell.hidden)
+        self.assertFalse(cell.marked)
         self.assertEqual(cell.content, 0)
+
 
 class TestBuscaMinas(unittest.TestCase):
     def test_grid_initialization(self):
@@ -96,6 +99,37 @@ class TestBuscaMinas(unittest.TestCase):
                             if game.grid[ni][nj].isBomb())
                     self.assertEqual(game.grid[i][j].content, total_bombs_adjacent)
 
-        
+    def test_can_mark_hidden_cell_with_bomb(self):
+        game = BuscaMinas(3, 3, 9)
+        game.mark_cell(0, 0)
+        self.assertTrue(game.grid[0][0].marked)
+
+    def test_can_mark_hidden_cell_without_bomb(self):
+        game = BuscaMinas(3, 3, 0)
+        game.mark_cell(0, 0)
+        self.assertTrue(game.grid[0][0].marked)
+
+    def test_cannot_mark_revealed_cell(self):
+        game = BuscaMinas(3, 3, 0)
+        game.select_cell(0, 0)
+        game.mark_cell(0, 0)
+        self.assertFalse(game.grid[0][0].marked)
+
+    def test_mark_a_marked_cell_removes_mark(self):
+        game = BuscaMinas(3, 3, 0)
+        game.mark_cell(0, 0)
+        game.mark_cell(0, 0)
+        self.assertFalse(game.grid[0][0].marked)
+
+    def test_marked_cell_does_not_reveal(self):
+        game = BuscaMinas(3, 3, 0)
+
+        game.mark_cell(0, 0)  # Mark the cell
+        self.assertTrue(game.grid[0][0].hidden)
+
+        game.mark_cell(0, 0)  # Unmark the cell
+        self.assertTrue(game.grid[0][0].hidden)
+
+
 if __name__ == '__main__':
     unittest.main()

@@ -1,5 +1,6 @@
 import random
 
+
 class BuscaMinas:
     def __init__(self, width=9, height=9, numberOfBombs=10):
         self.width = width
@@ -61,11 +62,20 @@ class BuscaMinas:
                             if self.grid[ni][nj].isBomb():
                                 self.grid[i][j].content += 1
 
+    def mark_cell(self, x, y):
+        cell = self.grid[x][y]
+        if cell.hidden:
+            cell.mark()
+
+
 class Cell:
     def __init__(self, content) -> None:
         self.hidden = True
+        self.marked = False
         self.content = content
 
     def isBomb(self) -> bool:
         return self.content == -1
 
+    def mark(self):
+        self.marked = not self.marked
