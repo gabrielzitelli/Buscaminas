@@ -1,5 +1,6 @@
 import random
 
+
 class BuscaMinas:
     def __init__(self, width=9, height=9, numberOfBombs=10):
         self.width = width
@@ -27,7 +28,14 @@ class BuscaMinas:
         print()
         for row in self.grid:
             for col in row:
-                print(". " if col.hidden else f"{col.content} ", end="")
+                if col.marked:
+                    cell_display = "M "
+                elif col.hidden:
+                    cell_display = ". "
+                else:
+                    cell_display = str(col.content) + " "
+
+                print(cell_display, end="")
             print()
         print()
 
@@ -38,7 +46,6 @@ class BuscaMinas:
             print("¡Boom!")
         else:
             self.reveal_cell_and_adjacent(x, y)
-            self.display()
 
     def reveal_cell_and_adjacent(self, x, y):
         cell = self.grid[x][y]
@@ -61,11 +68,20 @@ class BuscaMinas:
                             if self.grid[ni][nj].isBomb():
                                 self.grid[i][j].content += 1
 
+    def mark_cell(self, x, y):
+        cell = self.grid[x][y]
+        if cell.hidden:
+            cell.mark()
+
+
 class Cell:
     def __init__(self, content) -> None:
         self.hidden = True
+        self.marked = False
         self.content = content
 
     def isBomb(self) -> bool:
         return self.content == -1
 
+    def mark(self):
+        self.marked = not self.marked
