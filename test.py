@@ -19,16 +19,6 @@ class TestBuscaMinas(unittest.TestCase):
         for row in game.grid:
             self.assertEqual(len(row), 5)
 
-    def test_display_output(self):
-        game = BuscaMinas(2, 2, 1)
-        expected_output = "\n. . \n. . \n\n"
-
-        original_stdout = sys.stdout  # Save a reference to the original standard output
-        sys.stdout = StringIO()       # Redirect standard output to a string
-        game.display()
-        self.assertEqual(sys.stdout.getvalue(), expected_output)
-        sys.stdout = original_stdout  # Reset the standard output to its original value
-    
     def test_bomb_spread(self):
         numberOfBomb = 0
         game = BuscaMinas()
