@@ -7,6 +7,7 @@ class BuscaMinas:
         self.height = height
         self.numberOfBombs = numberOfBombs
         self.grid = [[Cell(0) for _ in range(width)] for _ in range(height)]
+        self.bombsFounds = 0
 
         if (self.width * self.height < numberOfBombs):
             raise Exception("It is not possible to spread all bombs")
@@ -21,9 +22,9 @@ class BuscaMinas:
                 self.grid[rand_x][rand_y].content = -1
 
             numberOfBombs -= 1
-        
+
         self.add_numbers()
-    
+
     def display(self):
         print()
         for row in self.grid:
@@ -43,7 +44,7 @@ class BuscaMinas:
         cell = self.grid[x][y]
 
         if cell.isBomb():
-            print("¡Boom!")
+            self.game_over_lose()
         else:
             self.reveal_cell_and_adjacent(x, y)
 
@@ -58,7 +59,7 @@ class BuscaMinas:
         for i in range(max(0, x - 1), min(self.height, x + 2)):
             for j in range(max(0, y - 1), min(self.width, y + 2)):
                 self.reveal_cell_and_adjacent(i, j)
-                
+
     def add_numbers(self):
         for i in range(self.height):
             for j in range(self.width):
@@ -72,6 +73,33 @@ class BuscaMinas:
         cell = self.grid[x][y]
         if cell.hidden:
             cell.mark()
+            self.bombsFounds += 1
+            if (self.bombsFounds == self.numberOfBombs):
+                self.game_over_win()
+
+    def game_over_win(self):
+        print("¡You win!")
+        self.show_bombs()
+        raise Exception()
+
+    def game_over_lose(self):
+
+        print("You lose!")
+        self.show_bombs()
+        raise Exception()
+
+    def show_bombs(self):
+        print()
+        for row in self.grid:
+            for col in row:
+                if(col.isBomb()):
+                    cell_display = "B "
+                else:
+                    cell_display = ". "
+
+                print(cell_display, end="")
+            print()
+        print()
 
 
 class Cell:
