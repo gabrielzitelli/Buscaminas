@@ -5,7 +5,10 @@ RESOLUTION = (600, 600)
 
 def main():
     game = View(RESOLUTION)
-    game.run()
+    try:
+        game.run()
+    except:
+        print("Game Over")
 
 
 if __name__ == "__main__":
