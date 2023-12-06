@@ -1,26 +1,15 @@
-from buscaminas import BuscaMinas
+from view import View
+
+RESOLUTION = (600, 600)
 
 
 def main():
-    game = BuscaMinas()
-    game.display()
-
+    game = View(RESOLUTION)
     try:
-        while True:
-            x = int(input("X: "))
-            y = int(input("Y: "))
-            if x <= -1 or y <= -1:
-                break
-
-            mark = input("Mark? (y/n): ")
-            if mark.lower() == "y":
-                game.mark_cell(x, y)
-            else:
-                game.select_cell(x, y)
-
-            game.display()
+        game.run()
     except:
         print("Game Over")
+
 
 if __name__ == "__main__":
     main()

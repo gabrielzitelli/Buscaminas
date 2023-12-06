@@ -25,20 +25,10 @@ class BuscaMinas:
 
         self.add_numbers()
 
-    def display(self):
-        print()
-        for row in self.grid:
-            for col in row:
-                if col.marked:
-                    cell_display = "M "
-                elif col.hidden:
-                    cell_display = ". "
-                else:
-                    cell_display = str(col.content) + " "
-
-                print(cell_display, end="")
-            print()
-        print()
+    def display(self, display):
+        for i in range(self.height):
+            for j in range(self.width):
+                display.draw_cell(self.grid[i][j].display(), (i, j))
 
     def select_cell(self, x, y):
         cell = self.grid[x][y]
@@ -52,6 +42,7 @@ class BuscaMinas:
         cell = self.grid[x][y]
         if cell.hidden:
             cell.hidden = False
+            cell.marked = False
             if cell.content == 0:
                 self.reveal_empty_cells(x, y)
 
@@ -113,3 +104,11 @@ class Cell:
 
     def mark(self):
         self.marked = not self.marked
+
+    def display(self):
+        if self.marked:
+            return "marked"
+        elif self.hidden:
+            return "hidden"
+        else:
+            return str(self.content)
