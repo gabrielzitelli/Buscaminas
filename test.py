@@ -24,7 +24,7 @@ class TestBuscaMinas(unittest.TestCase):
         game = BuscaMinas()
         for row in game.grid:
             for col in row:
-                if col.isBomb():
+                if col.is_bomb():
                     numberOfBomb += 1
         
         self.assertEqual(game.numberOfBombs, numberOfBomb)
@@ -36,7 +36,7 @@ class TestBuscaMinas(unittest.TestCase):
         # Find the position of a bomb
         for i in range(game.height):
             for j in range(game.width):
-                if game.grid[i][j].isBomb():
+                if game.grid[i][j].is_bomb():
                     bomb_x, bomb_y = i, j
                     break
         
@@ -54,7 +54,7 @@ class TestBuscaMinas(unittest.TestCase):
 
         for i in range(game.height):
             for j in range(game.width):
-                if not game.grid[i][j].isBomb():
+                if not game.grid[i][j].is_bomb():
                     empty_x, empty_y = i, j
                     break
         game.select_cell(empty_x, empty_y)
@@ -78,15 +78,15 @@ class TestBuscaMinas(unittest.TestCase):
 
         for i in range(game.height):
             for j in range(game.width):
-                if game.grid[i][j].isBomb():
+                if game.grid[i][j].is_bomb():
                     self.assertEqual(game.grid[i][j].content, -1)
 
         for i in range(game.height):
             for j in range(game.width):
-                if not game.grid[i][j].isBomb():
+                if not game.grid[i][j].is_bomb():
                     total_bombs_adjacent = sum(1 for ni in range(max(0, i - 1), min(game.height, i + 2))
                         for nj in range(max(0, j - 1), min(game.width, j + 2))
-                            if game.grid[ni][nj].isBomb())
+                            if game.grid[ni][nj].is_bomb())
                     self.assertEqual(game.grid[i][j].content, total_bombs_adjacent)
 
     def test_can_mark_hidden_cell_with_bomb(self):

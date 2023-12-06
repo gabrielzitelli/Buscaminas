@@ -1,7 +1,7 @@
 import pygame
 import os
 
-from buscaminas import BuscaMinas
+from buscaminas import BuscaMinas, GameOverWin, GameOverLose
 
 FRAMERATE = 120
 
@@ -9,9 +9,9 @@ BOARD_CONTOUR_WIDTH = 75
 BOARD_CONTOUR_HEIGHT = 75
 
 # Board settings
-BOARD_WIDTH = 16
-BOARD_HEIGHT = 16
-NUMBER_OF_BOMBS = 20
+BOARD_WIDTH = 4
+BOARD_HEIGHT = 4
+NUMBER_OF_BOMBS = 4
 
 
 class View:
@@ -20,6 +20,7 @@ class View:
         self.clock = pygame.time.Clock()
 
         pygame.init()
+        pygame.display.set_caption("Buscaminas")
         self.screen = pygame.display.set_mode(self.screen_size)
 
         self.board = BuscaMinas(BOARD_WIDTH, BOARD_HEIGHT, NUMBER_OF_BOMBS)
@@ -47,7 +48,12 @@ class View:
                     continue
 
                 if event.type == pygame.MOUSEBUTTONDOWN:
-                    self.interact(event.pos[0], event.pos[1], pygame.mouse.get_pressed(num_buttons=3)[2])
+                    try:
+                        self.interact(event.pos[0], event.pos[1], pygame.mouse.get_pressed(num_buttons=3)[2])
+                    except GameOverWin as e:
+                        pass
+                    except GameOverLose as e:
+                        pass
 
             self.board.display(self.display)
             pygame.display.flip()
