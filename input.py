@@ -1,6 +1,7 @@
 import pygame
 
 # Define some colors
+BACKGROUND_COLOR = (192, 192, 192)
 COLOR_INACTIVE = (128, 128, 128)
 COLOR_ACTIVE = (255, 255, 255)
 
@@ -63,3 +64,34 @@ class InputBox:
         # Blit dark grey border around the top and left side of the input box
         pygame.draw.rect(screen, COLOR_ACTIVE, (self.rect.x, self.rect.y + self.rect.h - border_width, self.rect.w, border_width))
         pygame.draw.rect(screen, COLOR_ACTIVE, (self.rect.x + self.rect.w - border_width, self.rect.y, border_width, self.rect.h))
+
+class Button:
+    def __init__(self, x, y, w, h, text='Click', font=None, on_click=None):
+        self.rect = pygame.Rect(x, y, w, h)
+        self.text = text
+        self.font = font
+        self.on_click = on_click
+
+    def handle_event(self, event):
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            # If the user clicked on the input_box rect.
+            if self.rect.collidepoint(event.pos) and self.on_click is not None:
+                self.on_click()
+
+    def draw(self, screen):
+        # Draw button with padding
+        button_padding = 10
+        button_text = self.font.render(self.text, True, COLOR_INACTIVE)
+        button_text_rect = button_text.get_rect(center=(self.rect.x + self.rect.width // 2, self.rect.y + self.rect.height // 2))
+        button_rect = pygame.Rect(button_text_rect.x - button_padding * 2, button_text_rect.y - button_padding, button_text_rect.width + button_padding * 4, button_text_rect.height + button_padding * 2)
+        pygame.draw.rect(screen, BACKGROUND_COLOR, button_rect)
+        screen.blit(button_text, button_text_rect)
+
+        # Draw white border around the left and top side of the button
+        border_width = 3
+        pygame.draw.rect(screen, COLOR_ACTIVE, (button_rect.x, button_rect.y, button_rect.w, border_width))
+        pygame.draw.rect(screen, COLOR_ACTIVE, (button_rect.x, button_rect.y, border_width, button_rect.h))
+
+        # Draw dark grey border around the right and bottom side of the button
+        pygame.draw.rect(screen, COLOR_INACTIVE, (button_rect.x, button_rect.y + button_rect.h - border_width, button_rect.w, border_width))
+        pygame.draw.rect(screen, COLOR_INACTIVE, (button_rect.x + button_rect.w - border_width, button_rect.y, border_width, button_rect.h))
