@@ -1,5 +1,10 @@
-import random
+import pygame, random, os
 
+BOARD_CONTOUR_WIDTH = 75
+BOARD_CONTOUR_HEIGHT = 75
+
+BOARD_WIDTH = 16
+BOARD_HEIGHT = 16
 
 class BuscaMinas:
     def __init__(self, width=9, height=9, number_of_bombs=10):
@@ -15,6 +20,24 @@ class BuscaMinas:
         self.spawn_bombs(number_of_bombs)
         self.add_numbers()
 
+    def load_sprites(self, screen_size):
+        # Calculate sprite size
+        self.cell_sprite_size = (
+            (screen_size[0] - BOARD_CONTOUR_WIDTH * 2) // BOARD_WIDTH,
+            (screen_size[1] - BOARD_CONTOUR_HEIGHT * 2) // BOARD_HEIGHT,
+        )
+
+        # Load sprites and scale them
+        self.sprites = {}
+        cells_path = "sprites/cells"
+        for filename in os.listdir(cells_path):
+            sprite = pygame.image.load(cells_path + "/" + filename)
+            sprite = sprite.convert()
+            sprite = pygame.transform.scale(sprite, self.cell_sprite_size)
+            self.sprites[filename.split(".")[0]] = sprite
+
+        return self.sprites, self.cell_sprite_size
+
     def spawn_bombs(self, number_of_bombs):
         while number_of_bombs != 0:
             rand_x = random.randint(0, self.height - 1)
@@ -26,6 +49,26 @@ class BuscaMinas:
                 self.grid[rand_x][rand_y].content = -1
 
             number_of_bombs -= 1
+
+    def interact(self, x, y, flag):
+        index = (int((x - BOARD_CONTOUR_WIDTH) // self.cell_sprite_size[0]),
+                 int((y - BOARD_CONTOUR_HEIGHT) // self.cell_sprite_size[1]))
+        if index[0] < 0 or index[0] >= BOARD_WIDTH or index[1] < 0 or index[1] >= BOARD_HEIGHT:
+            return
+
+        if flag:
+            self.mark_cell(index[0], index[1])
+        else:
+            self.select_cell(index[0], index[1])
+
+    def handle_event(self, event):
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            try:
+                self.interact(event.pos[0], event.pos[1], pygame.mouse.get_pressed(num_buttons=3)[2])
+            except GameOverWin as e:
+                pass
+            except GameOverLose as e:
+                pass
 
     def display(self, display):
         for i in range(self.height):
