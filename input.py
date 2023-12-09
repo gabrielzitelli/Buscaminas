@@ -1,8 +1,8 @@
 import pygame
 
 # Define some colors
-COLOR_INACTIVE = pygame.Color('lightskyblue3')
-COLOR_ACTIVE = pygame.Color('dodgerblue2')
+COLOR_INACTIVE = (128, 128, 128)
+COLOR_ACTIVE = (255, 255, 255)
 
 class InputBox:
     def __init__(self, x, y, w, h, font, text=''):
@@ -24,6 +24,9 @@ class InputBox:
                 self.active = False
             # Change the current color of the input box.
             self.color = COLOR_ACTIVE if self.active else COLOR_INACTIVE
+
+            # Re-render the text.
+            self.txt_surface = self.FONT.render(self.text, True, self.color)
         if event.type == pygame.KEYDOWN:
             if self.active:
                 if event.key == pygame.K_RETURN:
@@ -42,7 +45,17 @@ class InputBox:
         self.rect.w = width
 
     def draw(self, screen):
-        # Blit the text.
+        # Blit the text
         screen.blit(self.txt_surface, (self.rect.x+5, self.rect.y+5))
-        # Blit the rect.
+
+        # Blit the rect
         pygame.draw.rect(screen, self.color, self.rect, 2)
+
+        # Blit white border around the bottom and right side of the input box
+        border_width = 3
+        pygame.draw.rect(screen, COLOR_INACTIVE, (self.rect.x, self.rect.y, self.rect.w, border_width))
+        pygame.draw.rect(screen, COLOR_INACTIVE, (self.rect.x, self.rect.y, border_width, self.rect.h))
+
+        # Blit dark grey border around the top and left side of the input box
+        pygame.draw.rect(screen, COLOR_ACTIVE, (self.rect.x, self.rect.y + self.rect.h - border_width, self.rect.w, border_width))
+        pygame.draw.rect(screen, COLOR_ACTIVE, (self.rect.x + self.rect.w - border_width, self.rect.y, border_width, self.rect.h))
