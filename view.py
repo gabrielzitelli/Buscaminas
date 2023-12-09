@@ -8,11 +8,21 @@ FRAMERATE = 120
 BOARD_CONTOUR_WIDTH = 75
 BOARD_CONTOUR_HEIGHT = 75
 
+# Colors
+BACKGROUND_COLOR = (192, 192, 192)
+
 # Board settings
 BOARD_WIDTH = 4
 BOARD_HEIGHT = 4
 NUMBER_OF_BOMBS = 4
 
+
+class MenuView:
+    def __init__(self, screen):
+        self.screen = screen
+
+    def display(self, display):
+        self.screen.fill(BACKGROUND_COLOR)
 
 class View:
     def __init__(self, screen_size):
@@ -23,6 +33,10 @@ class View:
         pygame.display.set_caption("Buscaminas")
         self.screen = pygame.display.set_mode(self.screen_size)
 
+        # Initialize menu
+        self.menu = MenuView(self.screen)
+
+        # Initialize board (probably should be initialized after menu configuration)
         self.board = BuscaMinas(BOARD_WIDTH, BOARD_HEIGHT, NUMBER_OF_BOMBS)
 
         self.cell_sprite_size = ((screen_size[0] - BOARD_CONTOUR_WIDTH * 2) // BOARD_WIDTH,
@@ -30,6 +44,13 @@ class View:
         self.sprites = {}
         self.load_sprites()
         self.display = Display(self.sprites, self.cell_sprite_size, self.screen)
+
+        # Create state map and initialize state
+        self.state = "MENU"
+        self.state_map = {
+            "MENU": self.menu,
+            "GAME": self.board
+        }
 
     def load_sprites(self):
         cells_path = "sprites/cells"
@@ -55,7 +76,8 @@ class View:
                     except GameOverLose as e:
                         pass
 
-            self.board.display(self.display)
+            # Update screen based on state
+            self.state_map[self.state].display(self.display)
             pygame.display.flip()
             self.clock.tick(FRAMERATE)
 
