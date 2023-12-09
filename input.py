@@ -5,12 +5,13 @@ COLOR_INACTIVE = (128, 128, 128)
 COLOR_ACTIVE = (255, 255, 255)
 
 class InputBox:
-    def __init__(self, x, y, w, h, font, text=''):
+    def __init__(self, x, y, w, h, font, text='', label=''):
         self.FONT = font
 
         self.rect = pygame.Rect(x, y, w, h)
         self.color = COLOR_INACTIVE
         self.text = text
+        self.label = label
         self.txt_surface = self.FONT.render(text, True, self.color)
         self.active = False
 
@@ -45,6 +46,9 @@ class InputBox:
         self.rect.w = width
 
     def draw(self, screen):
+        # Blit the label
+        screen.blit(self.FONT.render(self.label, True, COLOR_INACTIVE), (self.rect.x, self.rect.y-25))
+
         # Blit the text
         screen.blit(self.txt_surface, (self.rect.x+5, self.rect.y+5))
 
