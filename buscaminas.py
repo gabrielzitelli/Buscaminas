@@ -3,9 +3,6 @@ import pygame, random, os
 BOARD_CONTOUR_WIDTH = 75
 BOARD_CONTOUR_HEIGHT = 75
 
-BOARD_WIDTH = 16
-BOARD_HEIGHT = 16
-
 class BuscaMinas:
     def __init__(self, width=9, height=9, number_of_bombs=10):
         self.width = width
@@ -23,8 +20,8 @@ class BuscaMinas:
     def load_sprites(self, screen_size):
         # Calculate sprite size
         self.cell_sprite_size = (
-            (screen_size[0] - BOARD_CONTOUR_WIDTH * 2) // BOARD_WIDTH,
-            (screen_size[1] - BOARD_CONTOUR_HEIGHT * 2) // BOARD_HEIGHT,
+            (screen_size[0] - BOARD_CONTOUR_WIDTH * 2) // self.width,
+            (screen_size[1] - BOARD_CONTOUR_HEIGHT * 2) // self.height,
         )
 
         # Load sprites and scale them
@@ -53,7 +50,7 @@ class BuscaMinas:
     def interact(self, x, y, flag):
         index = (int((x - BOARD_CONTOUR_WIDTH) // self.cell_sprite_size[0]),
                  int((y - BOARD_CONTOUR_HEIGHT) // self.cell_sprite_size[1]))
-        if index[0] < 0 or index[0] >= BOARD_WIDTH or index[1] < 0 or index[1] >= BOARD_HEIGHT:
+        if index[0] < 0 or index[0] >= self.width or index[1] < 0 or index[1] >= self.height:
             return
 
         if flag:
@@ -69,8 +66,14 @@ class BuscaMinas:
                 pass
             except GameOverLose as e:
                 pass
+        
+        return "GAME", {}
 
     def display(self, display):
+        # Draw background
+        display.draw_background()
+
+        # Draw cells
         for i in range(self.height):
             for j in range(self.width):
                 display.draw_cell(self.grid[i][j].display(), (i, j))

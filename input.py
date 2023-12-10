@@ -16,6 +16,9 @@ class InputBox:
         self.txt_surface = self.FONT.render(text, True, self.color)
         self.active = False
 
+    def get_text(self):
+        return self.text
+
     def handle_event(self, event):
         if event.type == pygame.MOUSEBUTTONDOWN:
             # If the user clicked on the input_box rect.

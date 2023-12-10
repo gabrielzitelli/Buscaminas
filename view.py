@@ -12,12 +12,13 @@ BOARD_CONTOUR_HEIGHT = 75
 BACKGROUND_COLOR = (192, 192, 192)
 
 # Board settings
-BOARD_SIZE = 16
-NUMBER_OF_BOMBS = 16
+INITIAL_BOARD_SIZE = 16
+INITIAL_NUMBER_OF_BOMBS = 16
 
 class MenuView:
     def __init__(self, screen):
         self.screen = screen
+        self.game_started = False
 
         # Calculate measurements
         half_width = screen.get_width() // 2
@@ -27,8 +28,8 @@ class MenuView:
 
         # Create input boxes
         self.input_boxes = []
-        self.input_boxes.append(InputBox(half_width - input_box_width, (fifth_height * 2) - input_box_height, input_box_width, input_box_height, pygame.font.Font(None, 32), str(BOARD_SIZE), "Board Size:"))
-        self.input_boxes.append(InputBox(half_width - input_box_width, (fifth_height * 3) - input_box_height, input_box_width, input_box_height, pygame.font.Font(None, 32), str(BOARD_SIZE), "Bomb Count:"))
+        self.input_boxes.append(InputBox(half_width - input_box_width, (fifth_height * 2) - input_box_height, input_box_width, input_box_height, pygame.font.Font(None, 32), str(INITIAL_BOARD_SIZE), "Board Size:"))
+        self.input_boxes.append(InputBox(half_width - input_box_width, (fifth_height * 3) - input_box_height, input_box_width, input_box_height, pygame.font.Font(None, 32), str(INITIAL_NUMBER_OF_BOMBS), "Bomb Count:"))
 
         # Create button
         self.start_button = Button(
@@ -42,7 +43,7 @@ class MenuView:
         )
 
     def start_game(self):
-        print("Start game")
+        self.game_started = True
 
     def handle_event(self, event):
         # Handle events for button
@@ -51,6 +52,14 @@ class MenuView:
         # Handle events for input boxes
         for box in self.input_boxes:
             box.handle_event(event)
+
+        return (
+            "GAME" if self.game_started else "MENU", 
+            {
+                "board_size": self.input_boxes[0].get_text(),
+                "bomb_count": self.input_boxes[1].get_text(),
+            }
+        )
 
     def display(self, display):
         # Draw background
@@ -82,12 +91,11 @@ class View:
         # Initialize menu
         self.menu = MenuView(self.screen)
 
-        # Initialize board (probably should be initialized after menu configuration)
-        self.board = BuscaMinas(BOARD_SIZE, BOARD_SIZE, NUMBER_OF_BOMBS)
-        sprites, cell_sprite_size = self.board.load_sprites(screen_size)
-
-        # Initialize display
-        self.display = Display(sprites, cell_sprite_size, self.screen)
+        # Initialize board
+        self.board = None
+        
+        # Create display
+        self.display = None
 
         # Create state map and initialize state
         self.state = "MENU"
@@ -99,16 +107,32 @@ class View:
     def run(self):
         running = True
         while running:
+            next_state = self.state
+            ctx = {}
+
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     running = False
                     continue
 
                 # Handle events based on state
-                self.state_map[self.state].handle_event(event)
+                next_state, ctx = self.state_map[self.state].handle_event(event)
 
             # Update screen based on state
             self.state_map[self.state].display(self.display)
+
+            # Check if state changed
+            if next_state != self.state:
+                if next_state == "GAME":
+                    # Initialize board
+                    self.board = BuscaMinas(int(ctx["board_size"]), int(ctx["board_size"]), int(ctx["bomb_count"]))
+                    sprites, cell_sprite_size = self.board.load_sprites(self.screen_size)
+                    self.display = Display(sprites, cell_sprite_size, self.screen)
+                    self.state_map["GAME"] = self.board
+
+            # Update state
+            self.state = next_state
+
             pygame.display.flip()
             self.clock.tick(FRAMERATE)
 
@@ -119,6 +143,9 @@ class Display:
         self.sprites = sprites
         self.sprite_size = sprite_size
         self.screen = screen
+
+    def draw_background(self):
+        self.screen.fill(BACKGROUND_COLOR)
 
     def draw_cell(self, cell, index_pos):
         top_left_corner = (index_pos[0] * self.sprite_size[0] + BOARD_CONTOUR_WIDTH,
