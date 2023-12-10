@@ -42,8 +42,33 @@ class MenuView:
             self.start_game
         )
 
+    def input_is_valid(self):
+        board_size = self.input_boxes[0].get_text()
+        bomb_count = self.input_boxes[1].get_text()
+
+        # Check if input are numbers
+        if not board_size.isdigit() or not bomb_count.isdigit():
+            return False
+
+        board_size = int(board_size)
+        bomb_count = int(bomb_count)
+
+        # Check if board size is in range
+        if board_size < 2 or board_size > 30:
+            return False
+
+        # Check if bomb count is valid
+        if bomb_count < 1:
+            return False
+
+        # Check if bomb count fits in board
+        if board_size * board_size < bomb_count:
+            return False
+
+        return True
+
     def start_game(self):
-        self.game_started = True
+        self.game_started = self.input_is_valid()
 
     def handle_event(self, event):
         # Handle events for button
