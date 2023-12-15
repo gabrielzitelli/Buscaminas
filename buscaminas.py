@@ -63,6 +63,7 @@ class BuscaMinas:
         if event.type == pygame.MOUSEBUTTONDOWN:
             try:
                 self.interact(event.pos[0], event.pos[1], pygame.mouse.get_pressed(num_buttons=3)[2])
+                self.check_game_over()
             except GameOverWin as e:
                 pass
             except GameOverLose as e:
