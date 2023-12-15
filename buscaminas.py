@@ -10,6 +10,7 @@ class BuscaMinas:
         self.numberOfBombs = number_of_bombs
         self.grid = [[Cell(0) for _ in range(width)] for _ in range(height)]
         self.bombsFounds = 0
+        self.cellsRevealed = 0
 
         if self.width * self.height < number_of_bombs:
             raise Exception("It is not possible to spread all bombs")
@@ -80,6 +81,8 @@ class BuscaMinas:
 
     def select_cell(self, x, y):
         cell = self.grid[x][y]
+        if cell.marked:
+            return
 
         if cell.is_bomb():
             self.game_over_lose(cell)
@@ -90,6 +93,7 @@ class BuscaMinas:
         cell = self.grid[x][y]
         if cell.hidden:
             cell.reveal()
+            self.cellsRevealed += 1
             if cell.content == 0:
                 self.reveal_empty_cells(x, y)
 
@@ -109,11 +113,20 @@ class BuscaMinas:
 
     def mark_cell(self, x, y):
         cell = self.grid[x][y]
-        if cell.hidden:
-            cell.mark()
-            self.bombsFounds += 1
-            if self.bombsFounds == self.numberOfBombs:
-                self.game_over_win()
+        if not cell.hidden:
+            return
+
+        cell.mark()
+        value = -1 if cell.is_bomb() else 1
+        if cell.marked:
+            self.bombsFounds -= value
+        else:
+            self.bombsFounds += value
+
+    def check_game_over(self):
+        number_empty_cells = self.width * self.height - self.numberOfBombs
+        if self.cellsRevealed == number_empty_cells and self.bombsFounds == self.numberOfBombs:
+            self.game_over_win()
 
     def game_over_win(self):
         print("¡You win!")
@@ -130,6 +143,7 @@ class BuscaMinas:
         for row in self.grid:
             for col in row:
                 if col.is_bomb():
+                    col.marked = False
                     col.reveal()
                     col.content = content
 
@@ -147,8 +161,10 @@ class Cell:
         self.marked = not self.marked
 
     def reveal(self):
+        if self.marked:
+            return
+
         self.hidden = False
-        self.marked = False
 
     def display(self):
         if self.marked:
