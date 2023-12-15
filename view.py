@@ -1,18 +1,108 @@
 import pygame
-import os
 
-from buscaminas import BuscaMinas, GameOverWin, GameOverLose
+from input import InputBox, Button
+from buscaminas import BuscaMinas
 
 FRAMERATE = 120
 
 BOARD_CONTOUR_WIDTH = 75
 BOARD_CONTOUR_HEIGHT = 75
 
-# Board settings
-BOARD_WIDTH = 4
-BOARD_HEIGHT = 4
-NUMBER_OF_BOMBS = 4
+# Colors
+BACKGROUND_COLOR = (192, 192, 192)
 
+# Board settings
+INITIAL_BOARD_SIZE = 16
+INITIAL_NUMBER_OF_BOMBS = 16
+
+class MenuView:
+    def __init__(self, screen):
+        self.screen = screen
+        self.game_started = False
+
+        # Calculate measurements
+        half_width = screen.get_width() // 2
+        fifth_height = screen.get_height() // 5
+        input_box_width = 100
+        input_box_height = 32
+
+        # Create input boxes
+        self.input_boxes = []
+        self.input_boxes.append(InputBox(half_width - input_box_width, (fifth_height * 2) - input_box_height, input_box_width, input_box_height, pygame.font.Font(None, 32), str(INITIAL_BOARD_SIZE), "Board Size:"))
+        self.input_boxes.append(InputBox(half_width - input_box_width, (fifth_height * 3) - input_box_height, input_box_width, input_box_height, pygame.font.Font(None, 32), str(INITIAL_NUMBER_OF_BOMBS), "Bomb Count:"))
+
+        # Create button
+        self.start_button = Button(
+            half_width - input_box_width // 2, 
+            fifth_height * 4, 
+            input_box_width, 
+            input_box_height, 
+            "Play", 
+            pygame.font.Font(None, 32), 
+            self.start_game
+        )
+
+    def input_is_valid(self):
+        board_size = self.input_boxes[0].get_text()
+        bomb_count = self.input_boxes[1].get_text()
+
+        # Check if input are numbers
+        if not board_size.isdigit() or not bomb_count.isdigit():
+            return False
+
+        board_size = int(board_size)
+        bomb_count = int(bomb_count)
+
+        # Check if board size is in range
+        if board_size < 2 or board_size > 30:
+            return False
+
+        # Check if bomb count is valid
+        if bomb_count < 1:
+            return False
+
+        # Check if bomb count fits in board
+        if board_size * board_size < bomb_count:
+            return False
+
+        return True
+
+    def start_game(self):
+        self.game_started = self.input_is_valid()
+
+    def handle_event(self, event):
+        # Handle events for button
+        self.start_button.handle_event(event)
+
+        # Handle events for input boxes
+        for box in self.input_boxes:
+            box.handle_event(event)
+
+        return (
+            "GAME" if self.game_started else "MENU", 
+            {
+                "board_size": self.input_boxes[0].get_text(),
+                "bomb_count": self.input_boxes[1].get_text(),
+            }
+        )
+
+    def display(self, display):
+        # Draw background
+        self.screen.fill(BACKGROUND_COLOR)
+
+        # Draw title
+        title_font = pygame.font.Font(None, 96)
+        title_text = title_font.render("Buscaminas", True, (96, 96, 96))
+        title_text_rect = title_text.get_rect(center=(self.screen.get_width() // 2, self.screen.get_height() // 7))
+        self.screen.blit(title_text, title_text_rect)
+
+        # Draw button with padding
+        self.start_button.draw(self.screen)
+
+        # Draw input boxes
+        for box in self.input_boxes:
+            box.update()
+            box.draw(self.screen)
 
 class View:
     def __init__(self, screen_size):
@@ -23,62 +113,64 @@ class View:
         pygame.display.set_caption("Buscaminas")
         self.screen = pygame.display.set_mode(self.screen_size)
 
-        self.board = BuscaMinas(BOARD_WIDTH, BOARD_HEIGHT, NUMBER_OF_BOMBS)
+        # Initialize menu
+        self.menu = MenuView(self.screen)
 
-        self.cell_sprite_size = ((screen_size[0] - BOARD_CONTOUR_WIDTH * 2) // BOARD_WIDTH,
-                                 (screen_size[1] - BOARD_CONTOUR_HEIGHT * 2) // BOARD_HEIGHT)
-        self.sprites = {}
-        self.load_sprites()
-        self.display = Display(self.sprites, self.cell_sprite_size, self.screen)
+        # Initialize board
+        self.board = None
+        
+        # Create display
+        self.display = None
 
-    def load_sprites(self):
-        cells_path = "sprites/cells"
-        for filename in os.listdir(cells_path):
-            sprite = pygame.image.load(cells_path + "/" + filename)
-            sprite = sprite.convert()
-            sprite = pygame.transform.scale(sprite, self.cell_sprite_size)
-            self.sprites[filename.split(".")[0]] = sprite
+        # Create state map and initialize state
+        self.state = "MENU"
+        self.state_map = {
+            "MENU": self.menu,
+            "GAME": self.board
+        }
 
     def run(self):
         running = True
         while running:
+            next_state = self.state
+            ctx = {}
+
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     running = False
                     continue
 
-                if event.type == pygame.MOUSEBUTTONDOWN:
-                    try:
-                        self.interact(event.pos[0], event.pos[1], pygame.mouse.get_pressed(num_buttons=3)[2])
-                        self.board.check_game_over()
-                    except GameOverWin as e:
-                        pass
-                    except GameOverLose as e:
-                        pass
+                # Handle events based on state
+                next_state, ctx = self.state_map[self.state].handle_event(event)
 
-            self.board.display(self.display)
+            # Update screen based on state
+            self.state_map[self.state].display(self.display)
+
+            # Check if state changed
+            if next_state != self.state:
+                if next_state == "GAME":
+                    # Initialize board
+                    self.board = BuscaMinas(int(ctx["board_size"]), int(ctx["board_size"]), int(ctx["bomb_count"]))
+                    sprites, cell_sprite_size = self.board.load_sprites(self.screen_size)
+                    self.display = Display(sprites, cell_sprite_size, self.screen)
+                    self.state_map["GAME"] = self.board
+
+            # Update state
+            self.state = next_state
+
             pygame.display.flip()
             self.clock.tick(FRAMERATE)
 
         pygame.quit()
-
-    def interact(self, x, y, flag):
-        index = (int((x - BOARD_CONTOUR_WIDTH) // self.cell_sprite_size[0]),
-                 int((y - BOARD_CONTOUR_HEIGHT) // self.cell_sprite_size[1]))
-        if index[0] < 0 or index[0] >= BOARD_WIDTH or index[1] < 0 or index[1] >= BOARD_HEIGHT:
-            return
-
-        if flag:
-            self.board.mark_cell(index[0], index[1])
-        else:
-            self.board.select_cell(index[0], index[1])
-
 
 class Display:
     def __init__(self, sprites, sprite_size, screen):
         self.sprites = sprites
         self.sprite_size = sprite_size
         self.screen = screen
+
+    def draw_background(self):
+        self.screen.fill(BACKGROUND_COLOR)
 
     def draw_cell(self, cell, index_pos):
         top_left_corner = (index_pos[0] * self.sprite_size[0] + BOARD_CONTOUR_WIDTH,
