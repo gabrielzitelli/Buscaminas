@@ -70,6 +70,9 @@ class MenuView:
     def start_game(self):
         self.game_started = self.input_is_valid()
 
+    def restart_game(self):
+        self.game_started = False
+
     def handle_event(self, event):
         # Handle events for button
         self.start_button.handle_event(event)
@@ -148,12 +151,17 @@ class View:
 
             # Check if state changed
             if next_state != self.state:
-                if next_state == "GAME":
+                if next_state == "GAME" or next_state == "RESTART":
                     # Initialize board
-                    self.board = BuscaMinas(int(ctx["board_size"]), int(ctx["board_size"]), int(ctx["bomb_count"]))
-                    sprites, cell_sprite_size = self.board.load_sprites(self.screen_size)
+                    self.board = BuscaMinas(self.screen_size, int(ctx["board_size"]), int(ctx["board_size"]), int(ctx["bomb_count"]))
+
+                    # Create display
+                    sprites, cell_sprite_size = self.board.load_sprites()
                     self.display = Display(sprites, cell_sprite_size, self.screen)
                     self.state_map["GAME"] = self.board
+                    self.state_map["RESTART"] = self.board
+                elif next_state == "MENU":
+                    self.menu.restart_game()
 
             # Update state
             self.state = next_state
@@ -176,3 +184,35 @@ class Display:
         top_left_corner = (index_pos[0] * self.sprite_size[0] + BOARD_CONTOUR_WIDTH,
                            index_pos[1] * self.sprite_size[1] + BOARD_CONTOUR_HEIGHT)
         self.screen.blit(self.sprites[cell], top_left_corner)
+
+    def draw_contour(self, width, height):
+        contour_size = 4
+
+        # NOTE: The order of the following draw functions is important
+        # Draw right contour
+        pygame.draw.rect(
+            self.screen,
+            (255, 255, 255),
+            (BOARD_CONTOUR_WIDTH + width * self.sprite_size[0], BOARD_CONTOUR_HEIGHT, contour_size, height * self.sprite_size[1])
+        )
+
+        # Draw top contour
+        pygame.draw.rect(
+            self.screen, 
+            (128, 128, 128), 
+            (BOARD_CONTOUR_WIDTH - contour_size, BOARD_CONTOUR_HEIGHT - contour_size, width * self.sprite_size[0] + contour_size * 2, contour_size)
+        )
+
+        # Draw bottom contour
+        pygame.draw.rect(
+            self.screen, 
+            (255, 255, 255), 
+            (BOARD_CONTOUR_WIDTH - contour_size, BOARD_CONTOUR_HEIGHT + height * self.sprite_size[1], width * self.sprite_size[0] + contour_size * 2, contour_size)
+        )
+
+        # Draw left contour
+        pygame.draw.rect(
+            self.screen, 
+            (128, 128, 128),
+            (BOARD_CONTOUR_WIDTH - contour_size, BOARD_CONTOUR_HEIGHT, contour_size, height * self.sprite_size[1])
+        )
