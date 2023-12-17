@@ -70,6 +70,9 @@ class MenuView:
     def start_game(self):
         self.game_started = self.input_is_valid()
 
+    def restart_game(self):
+        self.game_started = False
+
     def handle_event(self, event):
         # Handle events for button
         self.start_button.handle_event(event)
@@ -148,12 +151,18 @@ class View:
 
             # Check if state changed
             if next_state != self.state:
-                if next_state == "GAME":
+                print("Changing state from {} to {}".format(self.state, next_state))
+                if next_state == "GAME" or next_state == "RESTART":
                     # Initialize board
-                    self.board = BuscaMinas(int(ctx["board_size"]), int(ctx["board_size"]), int(ctx["bomb_count"]))
-                    sprites, cell_sprite_size = self.board.load_sprites(self.screen_size)
+                    self.board = BuscaMinas(self.screen_size, int(ctx["board_size"]), int(ctx["board_size"]), int(ctx["bomb_count"]))
+
+                    # Create display
+                    sprites, cell_sprite_size = self.board.load_sprites()
                     self.display = Display(sprites, cell_sprite_size, self.screen)
                     self.state_map["GAME"] = self.board
+                    self.state_map["RESTART"] = self.board
+                elif next_state == "MENU":
+                    self.menu.restart_game()
 
             # Update state
             self.state = next_state
