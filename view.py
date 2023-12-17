@@ -151,7 +151,6 @@ class View:
 
             # Check if state changed
             if next_state != self.state:
-                print("Changing state from {} to {}".format(self.state, next_state))
                 if next_state == "GAME" or next_state == "RESTART":
                     # Initialize board
                     self.board = BuscaMinas(self.screen_size, int(ctx["board_size"]), int(ctx["board_size"]), int(ctx["bomb_count"]))
