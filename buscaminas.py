@@ -1,10 +1,13 @@
 import pygame, random, os
 
+from input import Button
+
 BOARD_CONTOUR_WIDTH = 75
 BOARD_CONTOUR_HEIGHT = 75
 
 class BuscaMinas:
-    def __init__(self, width=9, height=9, number_of_bombs=10):
+    def __init__(self, screen_size, width=9, height=9, number_of_bombs=10):
+        self.screen_size = screen_size
         self.width = width
         self.height = height
         self.numberOfBombs = number_of_bombs
@@ -18,11 +21,46 @@ class BuscaMinas:
         self.spawn_bombs(number_of_bombs)
         self.add_numbers()
 
-    def load_sprites(self, screen_size):
+        # Button state variables
+        self.must_restart = False
+        self.must_go_to_menu = False
+        self.must_go_to_help = False
+
+        # Create three main buttons at the bottom of the screen: "Restart", "Menu" and "Help"
+        self.buttons = []
+        self.buttons.append(Button(
+            self.screen_size[0] // 10 * 1, 
+            screen_size[1] - 48,
+            100,
+            16,
+            "Restart",
+            pygame.font.Font(None, 32),
+            self.handle_restart
+        ))
+        self.buttons.append(Button(
+            self.screen_size[0] // 10 * 4.35, 
+            screen_size[1] - 48,
+            100,
+            16,
+            "Main Menu",
+            pygame.font.Font(None, 32),
+            self.handle_menu
+        ))
+        self.buttons.append(Button(
+            self.screen_size[0] // 10 * 7.5, 
+            screen_size[1] - 48,
+            100,
+            16,
+            "Help",
+            pygame.font.Font(None, 32),
+            self.handle_help
+        ))
+
+    def load_sprites(self):
         # Calculate sprite size
         self.cell_sprite_size = (
-            (screen_size[0] - BOARD_CONTOUR_WIDTH * 2) // self.width,
-            (screen_size[1] - BOARD_CONTOUR_HEIGHT * 2) // self.height,
+            (self.screen_size[0] - BOARD_CONTOUR_WIDTH * 2) // self.width,
+            (self.screen_size[1] - BOARD_CONTOUR_HEIGHT * 2) // self.height,
         )
 
         # Load sprites and scale them
@@ -59,6 +97,15 @@ class BuscaMinas:
         else:
             self.select_cell(index[0], index[1])
 
+    def handle_restart(self):
+        self.must_restart = True
+
+    def handle_menu(self):
+        self.must_go_to_menu = True
+    
+    def handle_help(self):
+        self.must_go_to_help = True
+
     def handle_event(self, event):
         if event.type == pygame.MOUSEBUTTONDOWN:
             try:
@@ -69,7 +116,28 @@ class BuscaMinas:
             except GameOverLose as e:
                 pass
         
-        return "GAME", {}
+        # Handle buttons
+        for button in self.buttons:
+            button.handle_event(event)
+
+        # Check if buttons were clicked
+        if self.must_restart:
+            self.must_restart = False
+            return "RESTART", {
+                "board_size": self.width,
+                "bomb_count": self.numberOfBombs
+            }
+        elif self.must_go_to_menu:
+            self.must_go_to_menu = False
+            return "MENU", {}
+        elif self.must_go_to_help:
+            self.must_go_to_help = False
+            # TODO: Implement help screen
+
+        return "GAME", {
+            "board_size": self.width,
+            "bomb_count": self.numberOfBombs
+        }
 
     def display(self, display):
         # Draw background
@@ -82,6 +150,10 @@ class BuscaMinas:
 
         # Draw contour
         display.draw_contour(self.width, self.height)
+
+        # Draw buttons
+        for button in self.buttons:
+            button.draw(display.screen)
 
     def select_cell(self, x, y):
         cell = self.grid[x][y]
