@@ -80,6 +80,9 @@ class BuscaMinas:
             for j in range(self.width):
                 display.draw_cell(self.grid[i][j].display(), (i, j))
 
+        # Draw contour
+        display.draw_contour(self.width, self.height)
+
     def select_cell(self, x, y):
         cell = self.grid[x][y]
         if cell.marked:

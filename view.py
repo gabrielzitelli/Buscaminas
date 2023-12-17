@@ -176,3 +176,35 @@ class Display:
         top_left_corner = (index_pos[0] * self.sprite_size[0] + BOARD_CONTOUR_WIDTH,
                            index_pos[1] * self.sprite_size[1] + BOARD_CONTOUR_HEIGHT)
         self.screen.blit(self.sprites[cell], top_left_corner)
+
+    def draw_contour(self, width, height):
+        contour_size = 4
+
+        # NOTE: The order of the following draw functions is important
+        # Draw right contour
+        pygame.draw.rect(
+            self.screen,
+            (255, 255, 255),
+            (BOARD_CONTOUR_WIDTH + width * self.sprite_size[0], BOARD_CONTOUR_HEIGHT, contour_size, height * self.sprite_size[1])
+        )
+
+        # Draw top contour
+        pygame.draw.rect(
+            self.screen, 
+            (128, 128, 128), 
+            (BOARD_CONTOUR_WIDTH - contour_size, BOARD_CONTOUR_HEIGHT - contour_size, width * self.sprite_size[0] + contour_size * 2, contour_size)
+        )
+
+        # Draw bottom contour
+        pygame.draw.rect(
+            self.screen, 
+            (255, 255, 255), 
+            (BOARD_CONTOUR_WIDTH - contour_size, BOARD_CONTOUR_HEIGHT + height * self.sprite_size[1], width * self.sprite_size[0] + contour_size * 2, contour_size)
+        )
+
+        # Draw left contour
+        pygame.draw.rect(
+            self.screen, 
+            (128, 128, 128),
+            (BOARD_CONTOUR_WIDTH - contour_size, BOARD_CONTOUR_HEIGHT, contour_size, height * self.sprite_size[1])
+        )
