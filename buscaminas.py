@@ -112,9 +112,17 @@ class BuscaMinas:
                 self.interact(event.pos[0], event.pos[1], pygame.mouse.get_pressed(num_buttons=3)[2])
                 self.check_game_over()
             except GameOverWin as e:
-                pass
+                return "POPUP", {
+                    "message": "You win!",
+                    "board_size": self.width,
+                    "bomb_count": self.numberOfBombs
+                }
             except GameOverLose as e:
-                pass
+                return "POPUP", {
+                    "message": "You lose!",
+                    "board_size": self.width,
+                    "bomb_count": self.numberOfBombs
+                }
         
         # Handle buttons
         for button in self.buttons:

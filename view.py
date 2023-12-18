@@ -1,5 +1,6 @@
 import pygame
 
+from popup import EndgamePopup
 from input import InputBox, Button
 from buscaminas import BuscaMinas
 
@@ -166,6 +167,9 @@ class View:
                     self.state_map["RESTART"] = self.board
                 elif next_state == "MENU":
                     self.menu.restart_game()
+                elif next_state == "POPUP":
+                    self.state_map["POPUP"] = EndgamePopup(self.screen, ctx["message"])
+                    self.state_map["POPUP"].store_game_info(ctx["board_size"], ctx["bomb_count"])
 
             # Update state
             self.state = next_state
