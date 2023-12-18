@@ -116,6 +116,10 @@ class View:
         pygame.display.set_caption("Buscaminas")
         self.screen = pygame.display.set_mode(self.screen_size)
 
+        # Set window icon
+        icon = pygame.image.load("sprites/icon.png")
+        pygame.display.set_icon(icon)   
+
         # Initialize menu
         self.menu = MenuView(self.screen)
 
