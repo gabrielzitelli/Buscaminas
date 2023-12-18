@@ -27,7 +27,7 @@ En principio la interfaz gráfica se realizará en la terminal, de tener todo fu
 
 El juego deberá ser lanzado desde una terminal tipeando:
 
-> python buscaminas.py
+> python main.py
 
 ## El juego y sus reglas
 
