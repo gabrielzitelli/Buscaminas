@@ -1,35 +1,47 @@
 # TP Análisis de la Información: Buscaminas
 
-Trabajo práctico de la materia Análisis de la Información de la Facultad de Ingeniería de la Universidad de Buenos Aires (FIUBA).
+Practical work for the Information Analysis course at the Faculty of Engineering of the University of Buenos Aires (FIUBA).
 
-## Resumen
+## The game and its rules
 
-El proyecto consiste en el desarrollo del clásico juego de Buscaminas.
+Minesweeper is a computer game that originated in the 1960s and became popular with its inclusion in the Windows operating system. The objective of the game is to clear a minefield without detonating a mine. The field is represented as a grid of square cells, some of which contain hidden mines. The player clicks on cells to uncover what's underneath. Each cell reveals a number indicating the number of adjacent mines (within a radius of 1 square around it). Using this information, the player must deduce the location of the mines and mark them with flags.
+The game is based on logic and deduction, and players must avoid clicking on mined cells. Clicking on a mine results in the loss of the game. The challenge lies in using the information provided by the numbers to make strategic decisions and avoid mines. The game has different difficulty levels, adjusting the field size and the number of mines to increase complexity. The ultimate goal is to reveal all non-mined cells without detonating any mines.
 
-El juego contiene un tablero de NxM dimensiones, con K minas distribuídas de manera aleatoria sobre el mismo, el objetivo es marcar todas las minas y revelar todas las demás celdas. Las celdas que no contengan minas marcarán con un número cuántas minas se encuentran en las celdas adyacentes.
+## Technologies
 
-## Grupo
+For this project, it was decided to use [Python](https://www.python.org) (Compatible with versions 3.9 and above).
 
-* **Integrante 1** - [Gabriel Zitelli](https://github.com/gabrielzitelli)
-* **Integrante 2** - [Francisco Strambini](https://github.com/FranFiuba)
-* **Integrante 3** - [Julio Piñango](https://github.com/julioPinango)
-* **Integrante 4** - [Walter Mamani](https://github.com/wjma)
-* **Integrante 5** - [Gian Keberlein](https://github.com/GianK128)
+The graphical interface was created using [Pygame](https://www.pygame.org/tags/framework).
 
-## Tecnologías
+To create the executable, the [Pyinstaller](https://pyinstaller.org/) library was used.
 
-Para este proyecto se decidió usar [Python](https://www.python.org) 3.9+
+## How to run the game
 
-En principio la interfaz gráfica se realizará en la terminal, de tener todo funcionando a término se sumará una interfaz gráfica utilizando [Pygame](https://www.pygame.org/tags/framework)
+The game is available only on Windows and is executed using the .exe found in the latest release.
 
+## How to contribute to the project
 
-## Cómo correr el juego
+To start development, you should install the necessary dependencies with the following command:
 
-El juego deberá ser lanzado desde una terminal tipeando:
+```shell
+# On Windows
+py -m pip install pygame
+# On Linux
+pip install pygame
+```
 
-> python main.py
+Then, you should clone the repository to work on the latest available version.
 
-## El juego y sus reglas
+To test changes locally, use the following line:
 
-Buscaminas es un juego de computadora que se originó en la década de 1960 y se popularizó con la inclusión en el sistema operativo Windows. El objetivo del juego es despejar un campo de minas evitando detonar las mismas. El campo se representa como una cuadrícula de celdas cuadradas, algunas de las cuales contienen minas ocultas. El jugador hace clic en las celdas para descubrir qué hay debajo. Cada celda revela un número que indica la cantidad de minas adyacentes (en un radio de 1 casilla a la redonda). Utilizando esta información, el jugador debe deducir la ubicación de las minas y marcarlas con banderas.
-El juego se basa en la lógica y la deducción, y los jugadores deben evitar hacer clic en celdas minadas. Hacer clic en una mina resulta en la pérdida del juego. El desafío radica en utilizar la información proporcionada por los números para tomar decisiones estratégicas y evitar las minas. El juego tiene diferentes niveles de dificultad, ajustando el tamaño del campo y la cantidad de minas para aumentar la complejidad. El objetivo final es revelar todas las celdas no minadas sin detonar ninguna mina, demostrando habilidad y paciencia.
+```shell
+python main.py
+```
+
+Group
+
+- Member 1 - Gabriel Zitelli-
+- Member 2 - Francisco Strambini
+- Member 3 - Julio Piñango
+- Member 4 - Walter Mamani
+- Member 5 - Gian Keberlein
