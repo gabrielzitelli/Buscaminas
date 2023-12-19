@@ -63,7 +63,7 @@ class MenuView:
             return False
 
         # Check if bomb count fits in board
-        if board_size * board_size < bomb_count:
+        if (board_size * board_size) <= bomb_count:
             return False
 
         return True
