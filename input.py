@@ -21,17 +21,18 @@ class InputBox:
 
     def handle_event(self, event):
         if event.type == pygame.MOUSEBUTTONDOWN:
-            # If the user clicked on the input_box rect.
-            if self.rect.collidepoint(event.pos):
-                # Toggle the active variable.
-                self.active = not self.active
-            else:
-                self.active = False
-            # Change the current color of the input box.
-            self.color = COLOR_ACTIVE if self.active else COLOR_INACTIVE
+            if pygame.mouse.get_pressed(num_buttons=3)[0]:
+                # If the user clicked on the input_box rect.
+                if self.rect.collidepoint(event.pos):
+                    # Toggle the active variable.
+                    self.active = not self.active
+                else:
+                    self.active = False
+                # Change the current color of the input box.
+                self.color = COLOR_ACTIVE if self.active else COLOR_INACTIVE
 
-            # Re-render the text.
-            self.txt_surface = self.FONT.render(self.text, True, self.color)
+                # Re-render the text.
+                self.txt_surface = self.FONT.render(self.text, True, self.color)
         if event.type == pygame.KEYDOWN:
             if self.active:
                 if event.key == pygame.K_RETURN:
@@ -76,9 +77,10 @@ class Button:
 
     def handle_event(self, event):
         if event.type == pygame.MOUSEBUTTONDOWN:
-            # If the user clicked on the input_box rect.
-            if self.rect.collidepoint(event.pos) and self.on_click is not None:
-                self.on_click()
+            if pygame.mouse.get_pressed(num_buttons=3)[0]:
+                # If the user clicked on the input_box rect.
+                if self.rect.collidepoint(event.pos) and self.on_click is not None:
+                    self.on_click()
 
     def draw(self, screen):
         # Draw button with padding

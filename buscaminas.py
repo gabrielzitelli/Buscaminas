@@ -109,8 +109,10 @@ class BuscaMinas:
     def handle_event(self, event):
         if event.type == pygame.MOUSEBUTTONDOWN:
             try:
-                self.interact(event.pos[0], event.pos[1], pygame.mouse.get_pressed(num_buttons=3)[2])
-                self.check_game_over()
+                # interact should only be called on left or right click
+                if pygame.mouse.get_pressed(num_buttons=3)[0] or pygame.mouse.get_pressed(num_buttons=3)[2]:
+                    self.interact(event.pos[0], event.pos[1], pygame.mouse.get_pressed(num_buttons=3)[2])
+                    self.check_game_over()
             except GameOverWin as e:
                 return "POPUP", {
                     "message": "You win!",
