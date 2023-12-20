@@ -1,9 +1,11 @@
-import pygame, random, os
+import pygame, random, os, sys
 
 from input import Button
 
 BOARD_CONTOUR_WIDTH = 75
 BOARD_CONTOUR_HEIGHT = 75
+
+sys.setrecursionlimit(2000)
 
 class BuscaMinas:
     def __init__(self, screen_size, width=9, height=9, number_of_bombs=10):
@@ -176,6 +178,8 @@ class BuscaMinas:
     def reveal_cell_and_adjacent(self, x, y):
         cell = self.grid[x][y]
         if cell.hidden:
+            if cell.marked: 
+                self.mark_cell(x,y)
             cell.reveal()
             self.cellsRevealed += 1
             if cell.content == 0:
