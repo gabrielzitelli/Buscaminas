@@ -38,7 +38,7 @@ class InputBox:
                     self.text = ''
                 elif event.key == pygame.K_BACKSPACE:
                     self.text = self.text[:-1]
-                else:
+                elif event.unicode.isdigit():
                     self.text += event.unicode
                 # Re-render the text.
                 self.txt_surface = self.FONT.render(self.text, True, self.color)
